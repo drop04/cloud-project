@@ -1,0 +1,76 @@
+name: ci
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      model_source:
+        description: "release = trained model from the GitHub Release; base = untrained pythia-70m (demonstrates the failing gate)"
+        default: release
+      release_tag:
+        default: models-v1
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install ruff==0.8.4
+      - run: ruff check .
+
+  unit-tests:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: pip install pytest==8.3.4 httpx==0.28.1 fastapi==0.115.6 pydantic==2.10.3 boto3==1.35.76 pyyaml==6.0.2
+      - run: python -m pytest -q
+
+  model-evaluation:
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.11"}
+      - run: |
+          pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cpu
+          pip install transformers==4.46.3 numpy==1.26.4
+      - name: Get model
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "${{ inputs.model_source }}" = "base" ]; then
+            echo "MODEL=EleutherAI/pythia-70m" >> $GITHUB_ENV
+          else
+            TAG="${{ inputs.release_tag || 'models-v1' }}"
+            gh release download "$TAG" --pattern 'model-v1.tar.gz' --repo "$GITHUB_REPOSITORY"
+            mkdir model && tar -xzf model-v1.tar.gz -C model
+            echo "MODEL=model" >> $GITHUB_ENV
+          fi
+      - run: python scripts/predict.py hf --model "$MODEL" --data data/validation.jsonl --out predictions.jsonl
+      - run: python tools/score.py predictions.jsonl data/validation.jsonl --out score_report.json
+      - uses: actions/upload-artifact@v4
+        with: {name: eval, path: "predictions.jsonl\nscore_report.json"}
+
+  quality-gate:
+    needs: model-evaluation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: {name: eval}
+      - run: python tools/score.py predictions.jsonl data/validation.jsonl --min-validity 95
+
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

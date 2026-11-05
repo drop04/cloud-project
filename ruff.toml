@@ -1,0 +1,5 @@
+line-length = 120
+extend-exclude = ["tools", "results", "kit_extract"]
+[lint]
+select = ["E", "F", "W"]
+ignore = ["E741", "E702", "E401", "E701", "E731", "E501"]

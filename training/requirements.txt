@@ -1,0 +1,5 @@
+# install torch first: pip install torch==2.5.1 --index-url https://download.pytorch.org/whl/cpu
+transformers==4.46.3
+numpy==1.26.4
+pyyaml==6.0.2
+boto3==1.35.76

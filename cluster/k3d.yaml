@@ -1,0 +1,10 @@
+apiVersion: k3d.io/v1alpha5
+kind: Simple
+metadata:
+  name: cloudproj
+servers: 1
+agents: 0            # single node: see README "limitations" (no multi-machine fault tolerance)
+ports:
+  - port: 8080:80    # Traefik ingress -> http://localhost:8080
+    nodeFilters:
+      - loadbalancer

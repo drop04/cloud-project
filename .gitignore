@@ -1,0 +1,13 @@
+models/*
+!models/v1/
+!models/v2/
+models/v1/*
+models/v2/*
+!models/v1/model.sha256
+!models/v2/model.sha256
+*.tar.gz
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.env
+*.key
