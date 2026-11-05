@@ -1,0 +1,4 @@
+'{"intent": "calendar_remove", "date": "upcoming", "time": null, "place": null}\n\nNote: The term \'upcoming\' is used to indicate a future date without specifying which day it falls on. In practice, the v'
+'{"intent": "alarm_set", "date": "sunday", "time": "five in the morning", "place": null}\n\nNote: The time phrase has been simplified to match the format given, without additional words like \'at\'. If the'
+'{"intent": "datetime_query", "date": null, "time": "right now", "place": "washington"}\n\nPlease note that in a real-world application, additional context or clarification might be needed to accurately '
+invalid: 66

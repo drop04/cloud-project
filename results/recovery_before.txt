@@ -1,0 +1,3 @@
+NAME                      READY   STATUS    RESTARTS   AGE
+parser-78b786b767-fp8t9   1/1     Running   0          3m46s
+parser-78b786b767-l9q4x   1/1     Running   0          3m51s

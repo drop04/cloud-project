@@ -1,0 +1,28 @@
+INFO:     Started server process [1]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+downloading v1/config.json (799 bytes)
+downloading v1/generation_config.json (111 bytes)
+downloading v1/model.files.sha256 (510 bytes)
+downloading v1/model.safetensors (281715176 bytes)
+downloading v1/model.sha256 (82 bytes)
+downloading v1/special_tokens_map.json (473 bytes)
+downloading v1/tokenizer.json (3564303 bytes)
+downloading v1/tokenizer_config.json (4846 bytes)
+model loaded, ready
+INFO:     10.42.0.1:48804 - "GET /readyz HTTP/1.1" 200 OK
+INFO:     Started server process [1]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+downloading v1/config.json (799 bytes)
+downloading v1/generation_config.json (111 bytes)
+downloading v1/model.files.sha256 (510 bytes)
+downloading v1/model.safetensors (281715176 bytes)
+downloading v1/model.sha256 (82 bytes)
+downloading v1/special_tokens_map.json (473 bytes)
+downloading v1/tokenizer.json (3564303 bytes)
+downloading v1/tokenizer_config.json (4846 bytes)
+model loaded, ready
+INFO:     10.42.0.1:59890 - "GET /readyz HTTP/1.1" 200 OK

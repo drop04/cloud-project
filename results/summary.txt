@@ -1,0 +1,39 @@
+== Task 2 scores ==
+base {'json_validity': 0.0, 'intent_accuracy': 0.0, 'date_accuracy': 0.0, 'time_accuracy': 0.0, 'place_accuracy': 0.0, 'full_frame': 0.0}
+teacher {'json_validity': 30.0, 'intent_accuracy': 26.0, 'date_accuracy': 23.0, 'time_accuracy': 27.0, 'place_accuracy': 29.0, 'full_frame': 17.0}
+teacher_firstline {'json_validity': 89.0, 'intent_accuracy': 72.0, 'date_accuracy': 68.0, 'time_accuracy': 78.0, 'place_accuracy': 76.0, 'full_frame': 40.0}
+student {'json_validity': 99.0, 'intent_accuracy': 70.0, 'date_accuracy': 79.0, 'time_accuracy': 87.0, 'place_accuracy': 86.0, 'full_frame': 41.0}
+== Task 4/7 load runs ==
+rolling_stats.csv: requests=1334 failures=29 (2.17%) median=890ms p95=1400ms rps=4.46
+recovery_stats.csv: requests=793 failures=8 (1.01%) median=880ms p95=1400ms rps=4.43
+hpa_stats.csv: requests=1534 failures=15 (0.98%) median=2500ms p95=3200ms rps=4.27
+loadtest_stats.csv: requests=509 failures=5 (0.98%) median=910ms p95=1300ms rps=4.28
+== header splits ==
+results/hpa_headers.json {'per_replica': {'parser-78b786b767-qdm9t': 792, 'parser-78b786b767-npq9k': 730}, 'per_model_version': {'v1': 1522}}
+results/loadtest_headers.json {'per_replica': {'parser-78b786b767-h2rrw': 257, 'parser-78b786b767-rbbqb': 251}, 'per_model_version': {'v1': 508}}
+results/recovery_headers.json {'per_replica': {'parser-78b786b767-fp8t9': 70, 'parser-78b786b767-l9q4x': 405, 'parser-78b786b767-4z74s': 313}, 'per_model_version': {'v1': 788}}
+results/rolling_headers.json {'per_replica': {'parser-78b786b767-qdm9t': 85, 'parser-78b786b767-npq9k': 76, 'parser-75c86fc9b7-wdjfn': 165, 'parser-75c86fc9b7-866p7': 137, 'parser-78b786b767-l9q4x': 423, 'parser-78b786b767-fp8t9': 422}, 'per_model_version': {'v1': 1006, 'v2': 302}}
+== other files ==
+--- results/coldstart_times.txt
+5.0
+5.0
+6.0
+6.0
+5.0
+5.0
+
+--- results/coldstart_median.txt
+median 5.0 n 6
+
+--- results/task3_memory.txt
+limits: --cpus 1 --memory 1g
+requests ok: 50 / 50
+OOMKilled: false
+peak memory (max of docker stats samples): 342.9 MiB
+--- docker stats (final) ---
+CONTAINER ID   NAME      CPU %     MEM USAGE / LIMIT   MEM %     NET I/O         BLOCK I/O    PIDS
+1c1ef00dec1c   memtest   0.13%     341.9MiB / 1GiB     33.39%    286MB / 670kB   0B / 270MB   18
+--- FAULT_INJECT check: run separately with -e FAULT_INJECT=1 ---
+
+--- results/after_rollback_env.json
+[{"name":"MODEL_VERSION","value":"v1"},{"name":"MODEL_URI","value":"s3://models/v1/"},{"name":"S3_ENDPOINT","value":"http://seaweedfs-s3.data.svc.cluster.local:8333"},{"name":"MAX_NEW_TOKENS","value":"64"},{"name":"AWS_ACCESS_KEY_ID","valueFrom":{"secretKeyRef":{"key":"AWS_ACCESS_KEY_ID","name":"s3-credentials"}}},{"name":"AWS_SECRET_ACCESS_KEY","valueFrom":{"secretKeyRef":{"key":"AWS_SECRET_ACCESS_KEY","name":"s3-credentials"}}}]

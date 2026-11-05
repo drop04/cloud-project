@@ -1,0 +1,10 @@
+{
+  "per_replica": {
+    "parser-78b786b767-fp8t9": 70,
+    "parser-78b786b767-l9q4x": 405,
+    "parser-78b786b767-4z74s": 313
+  },
+  "per_model_version": {
+    "v1": 788
+  }
+}
