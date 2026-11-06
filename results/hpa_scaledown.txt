@@ -1,0 +1,5 @@
+NAME     REFERENCE           TARGETS       MINPODS   MAXPODS   REPLICAS   AGE
+parser   Deployment/parser   cpu: 0%/70%   1         2         2          17h
+parser   Deployment/parser   cpu: 0%/70%   1         2         2          17h
+parser   Deployment/parser   cpu: 0%/70%   1         2         2          17h
+parser   Deployment/parser   cpu: 0%/70%   1         2         1          17h

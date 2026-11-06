@@ -1,0 +1,383 @@
+######## SECTION 1: Task 1
+
+--- kubectl -n pipeline get pods
+NAME                        READY   STATUS      RESTARTS   AGE
+curltest                    0/1     Completed   0          27h
+teacher-labelling-0-2zjgv   0/1     Completed   0          27h
+teacher-labelling-1-vw5l4   0/1     Completed   0          27h
+
+--- kubectl -n pipeline get job teacher-labelling
+NAME                STATUS     COMPLETIONS   DURATION   AGE
+teacher-labelling   Complete   2/2           4h59m      27h
+(counts table and sha256: copy from your saved clean.py output)
+
+######## SECTION 2: Task 2
+
+--- training/loss.csv
+epoch,train_loss
+1,0.199035
+2,0.077794
+3,0.058970
+
+--- training/loss_subset.csv
+epoch,train_loss
+1,1.108181
+2,0.300580
+3,0.146771
+
+--- training/loss_v2.csv
+epoch,train_loss
+1,0.203188
+2,0.077882
+3,0.060475
+4,0.056088
+
+--- diff training/config.yaml training/config_v2.yaml
+2c2
+< seed: 42
+---
+> seed: 7
+6c6
+< epochs: 3
+---
+> epochs: 4
+10,11c10,11
+< output_dir: models/v1
+< loss_csv: training/loss.csv
+---
+> output_dir: models/v2
+> loss_csv: training/loss_v2.csv
+
+--- models/v1/model.sha256
+d27538f6539a040fbd80a89b34b6518004fe3724f41c5975b9726f6361830aed  model-v1.tar.gz
+
+--- sha256sum models/model-v1.tar.gz
+d27538f6539a040fbd80a89b34b6518004fe3724f41c5975b9726f6361830aed  models/model-v1.tar.gz
+
+--- results/base_validation.json
+{
+  "json_validity": 0.0,
+  "intent_accuracy": 0.0,
+  "date_accuracy": 0.0,
+  "time_accuracy": 0.0,
+  "place_accuracy": 0.0,
+  "full_frame": 0.0,
+  "examples": 100,
+  "missing_predictions": 0
+}
+
+--- results/teacher_validation.json
+{
+  "json_validity": 30.0,
+  "intent_accuracy": 26.0,
+  "date_accuracy": 23.0,
+  "time_accuracy": 27.0,
+  "place_accuracy": 29.0,
+  "full_frame": 17.0,
+  "examples": 100,
+  "missing_predictions": 0
+}
+
+--- results/teacher_firstline_validation.json
+{
+  "json_validity": 89.0,
+  "intent_accuracy": 72.0,
+  "date_accuracy": 68.0,
+  "time_accuracy": 78.0,
+  "place_accuracy": 76.0,
+  "full_frame": 40.0,
+  "examples": 100,
+  "missing_predictions": 0
+}
+
+--- results/student_validation.json
+{
+  "json_validity": 99.0,
+  "intent_accuracy": 70.0,
+  "date_accuracy": 79.0,
+  "time_accuracy": 87.0,
+  "place_accuracy": 86.0,
+  "full_frame": 41.0,
+  "examples": 100,
+  "missing_predictions": 0
+}
+
+######## SECTION 3: Task 3
+
+--- docker images parser-service:local
+IMAGE                  ID             DISK USAGE   CONTENT SIZE   EXTRA
+parser-service:local   d7576d52c38a       1.19GB             0B        
+
+--- results/task3_memory.txt
+limits: --cpus 1 --memory 1g
+requests ok: 50 / 50
+OOMKilled: false
+peak memory (max of docker stats samples): 342.9 MiB
+--- docker stats (final) ---
+CONTAINER ID   NAME      CPU %     MEM USAGE / LIMIT   MEM %     NET I/O         BLOCK I/O    PIDS
+1c1ef00dec1c   memtest   0.13%     341.9MiB / 1GiB     33.39%    286MB / 670kB   0B / 270MB   18
+--- FAULT_INJECT check: run separately with -e FAULT_INJECT=1 ---
+
+--- results/fault_inject_500.txt
+HTTP/1.1 500 Internal Server Error
+date: Thu, 05 Nov 2026 21:14:05 GMT
+server: uvicorn
+content-length: 32
+content-type: application/json
+
+{"error":"invalid_model_output"}
+--- docker run --rm --entrypoint sh parser-service:local -c find / \( -name '*.safetensors' -o -name 'pytorch_model.bin' \) 2>/dev/null | wc -l
+0
+
+######## SECTION 4: Task 4
+
+--- results/endpoints_loading.txt
+NAME     ENDPOINTS         AGE
+parser   10.42.0.18:8000   20h
+parser   <none>            20h
+parser                     20h
+parser   10.42.0.20:8000   20h
+
+--- results/hpa_timeline.txt
+20:09:55
+parser   Deployment/parser   cpu: 0%/70%   1     2     1     23m
+20:10:03
+parser   Deployment/parser   cpu: 0%/70%   1     2     1     24m
+20:10:11
+parser   Deployment/parser   cpu: 0%/70%   1     2     1     24m
+20:10:19
+parser   Deployment/parser   cpu: 111%/70%   1     2     1     24m
+20:10:27
+parser   Deployment/parser   cpu: 111%/70%   1     2     1     24m
+20:10:35
+parser   Deployment/parser   cpu: 111%/70%   1     2     2     24m
+20:10:43
+parser   Deployment/parser   cpu: 111%/70%   1     2     2     24m
+20:10:51
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     24m
+20:10:59
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     24m
+20:11:07
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     25m
+20:11:15
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     25m
+20:11:23
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     25m
+20:11:31
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     25m
+20:11:39
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     25m
+20:11:47
+parser   Deployment/parser   cpu: 198%/70%   1     2     2     25m
+20:11:55
+parser   Deployment/parser   cpu: 198%/70%   1     2     2     25m
+20:12:03
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     26m
+20:12:11
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     26m
+20:12:19
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     26m
+20:12:28
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     26m
+20:12:36
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     26m
+20:12:44
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     26m
+20:12:52
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     26m
+20:13:00
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     26m
+20:13:08
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     27m
+20:13:16
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     27m
+20:13:24
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     27m
+20:13:32
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     27m
+20:13:40
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     27m
+20:13:48
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     27m
+20:13:56
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     27m
+20:14:04
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     28m
+20:14:12
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     28m
+20:14:20
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     28m
+20:14:28
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     28m
+20:14:36
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     28m
+20:14:44
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     28m
+20:14:52
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     28m
+20:15:00
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     29m
+20:15:09
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     29m
+20:15:17
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     29m
+20:15:25
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     29m
+20:15:33
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     29m
+20:15:41
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     29m
+20:15:49
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     29m
+20:15:57
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     29m
+20:16:05
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     30m
+20:16:13
+parser   Deployment/parser   cpu: 199%/70%   1     2     2     30m
+20:16:21
+parser   Deployment/parser   cpu: 122%/70%   1     2     2     30m
+20:16:29
+parser   Deployment/parser   cpu: 122%/70%   1     2     2     30m
+20:16:37
+parser   Deployment/parser   cpu: 0%/70%   1     2     2     30m
+20:16:45
+parser   Deployment/parser   cpu: 0%/70%   1     2     2     30m
+20:16:53
+parser   Deployment/parser   cpu: 0%/70%   1     2     2     30m
+20:17:01
+parser   Deployment/parser   cpu: 0%/70%   1     2     2     31m
+20:17:09
+parser   Deployment/parser   cpu: 0%/70%   1     2     2     31m
+20:17:17
+parser   Deployment/parser   cpu: 0%/70%   1     2     2     31m
+20:17:25
+parser   Deployment/parser   cpu: 0%/70%   1     2     2     31m
+20:17:33
+parser   Deployment/parser   cpu: 0%/70%   1     2     2     31m
+20:17:41
+parser   Deployment/parser   cpu: 0%/70%   1     2     2     31m
+20:17:49
+parser   Deployment/parser   cpu: 0%/70%   1     2     2     31m
+
+--- rolling / recovery / hpa load stats
+results/rolling_stats.csv: requests=1334 failures=29 (2.17%) p50=890ms p95=1400ms rps=4.46
+results/recovery_stats.csv: requests=793 failures=8 (1.01%) p50=880ms p95=1400ms rps=4.43
+results/hpa_stats.csv: requests=1534 failures=15 (0.98%) p50=2500ms p95=3200ms rps=4.27
+
+--- version split and replica shares
+per_replica {'parser-78b786b767-qdm9t': '85 (6.5%)', 'parser-78b786b767-npq9k': '76 (5.8%)', 'parser-75c86fc9b7-wdjfn': '165 (12.6%)', 'parser-75c86fc9b7-866p7': '137 (10.5%)', 'parser-78b786b767-l9q4x': '423 (32.3%)', 'parser-78b786b767-fp8t9': '422 (32.3%)'}
+per_model_version {'v1': '1006 (76.9%)', 'v2': '302 (23.1%)'}
+per_replica {'parser-78b786b767-h2rrw': '257 (50.6%)', 'parser-78b786b767-rbbqb': '251 (49.4%)'}
+per_model_version {'v1': '508 (100.0%)'}
+
+--- results/after_rollback.txt
+HTTP/1.1 200 OK
+Content-Length: 67
+Content-Type: application/json
+Date: Thu, 05 Nov 2026 14:52:57 GMT
+Server: uvicorn
+X-Model-Version: v1
+X-Served-By: parser-78b786b767-fp8t9
+
+{"intent":"weather_query","date":null,"time":null,"place":"london"}
+--- results/after_rollback_env.json
+[{"name":"MODEL_VERSION","value":"v1"},{"name":"MODEL_URI","value":"s3://models/v1/"},{"name":"S3_ENDPOINT","value":"http://seaweedfs-s3.data.svc.cluster.local:8333"},{"name":"MAX_NEW_TOKENS","value":"64"},{"name":"AWS_ACCESS_KEY_ID","valueFrom":{"secretKeyRef":{"key":"AWS_ACCESS_KEY_ID","name":"s3-credentials"}}},{"name":"AWS_SECRET_ACCESS_KEY","valueFrom":{"secretKeyRef":{"key":"AWS_SECRET_ACCESS_KEY","name":"s3-credentials"}}}]
+--- results/recovery_before.txt
+NAME                      READY   STATUS    RESTARTS   AGE
+parser-78b786b767-fp8t9   1/1     Running   0          3m46s
+parser-78b786b767-l9q4x   1/1     Running   0          3m51s
+
+--- results/recovery_replicas.txt
+parser   1/2   2     1     21h
+parser   2/2   2     2     21h
+parser   2/2   2     2     21h
+parser   2/2   2     2     21h
+parser   2/2   2     2     21h
+parser   2/2   2     2     21h
+parser   2/2   2     2     21h
+parser   2/2   2     2     21h
+parser   2/2   2     2     21h
+parser   2/2   2     2     21h
+parser   2/2   2     2     21h
+parser   2/2   2     2     21h
+parser   2/2   2     2     21h
+parser   2/2   2     2     21h
+parser   2/2   2     2     21h
+parser   2/2   2     2     21h
+parser   2/2   2     2     21h
+parser   2/2   2     2     21h
+parser   2/2   2     2     21h
+parser   2/2   2     2     21h
+parser   2/2   2     2     21h
+parser   2/2   2     2     21h
+parser   2/2   2     2     21h
+parser   2/2   2     2     21h
+
+--- results/coldstart_times.txt
+5.0
+5.0
+6.0
+6.0
+5.0
+5.0
+
+--- results/coldstart_median.txt
+median 5.0 n 6
+
+--- cold start download log lines
+downloading v1/config.json (799 bytes)
+downloading v1/generation_config.json (111 bytes)
+downloading v1/model.files.sha256 (510 bytes)
+downloading v1/model.safetensors (281715176 bytes)
+downloading v1/model.sha256 (82 bytes)
+downloading v1/special_tokens_map.json (473 bytes)
+
+######## SECTION 5: Task 5
+
+--- python tools/nacl_sim.py network/nacl.json network/packets_sample.jsonl --check
+ S01  inbound  tcp port 443   192.0.2.55      -> ALLOW (rule 120)  OK
+ S02  inbound  tcp port 22    192.0.2.55      -> DENY  (no match (default deny))  OK
+ S03  outbound tcp port 8000  10.20.1.1       -> ALLOW (rule 100)  OK
+ S04  inbound  tcp port 443   198.51.100.9    -> DENY  (rule 100)  OK
+ S05  outbound tcp port 60000 192.0.2.55      -> ALLOW (rule 110)  OK
+ S06  inbound  tcp port 5432  10.20.5.20      -> DENY  (no match (default deny))  OK
+
+Correct: 6 / 6 = 100.0%
+
+--- network/nacl.json
+{
+  "inbound": [
+    {"rule": 100, "protocol": "all", "port_from": 0,    "port_to": 65535, "cidr": "198.51.100.0/24", "action": "deny"},
+    {"rule": 110, "protocol": "tcp", "port_from": 80,   "port_to": 80,    "cidr": "0.0.0.0/0",       "action": "allow"},
+    {"rule": 120, "protocol": "tcp", "port_from": 443,  "port_to": 443,   "cidr": "0.0.0.0/0",       "action": "allow"},
+    {"rule": 130, "protocol": "tcp", "port_from": 22,   "port_to": 22,    "cidr": "10.20.5.128/27",  "action": "allow"},
+    {"rule": 140, "protocol": "tcp", "port_from": 1024, "port_to": 65535, "cidr": "10.20.0.0/22",    "action": "allow"}
+  ],
+  "outbound": [
+    {"rule": 100, "protocol": "tcp", "port_from": 8000, "port_to": 8000,  "cidr": "10.20.0.0/22",    "action": "allow"},
+    {"rule": 110, "protocol": "tcp", "port_from": 1024, "port_to": 65535, "cidr": "0.0.0.0/0",       "action": "allow"}
+  ]
+}
+
+######## SECTION 6: Task 6
+--- pytest
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+11 passed, 14 warnings in 0.42s
+
+--- git tag
+
+######## SECTION 7: Task 7
+results/loadtest_stats.csv: requests=509 failures=5 (0.98%) p50=910ms p95=1300ms rps=4.28
+
+--- results/loadtest_top_pods.txt
+NAME                      CPU(cores)   MEMORY(bytes)   
+parser-78b786b767-64h64   997m         437Mi           
+parser-78b786b767-h2rrw   996m         411Mi           
+
+--- python scripts/cost.py --replicas 2 --cpu 1 --mem-gib 1 --stats results/loadtest_stats.csv --slo 99
+hourly cost = 2.0 x (1.0 x 3.5 + 1.0 x 0.45) = 7.9000 INR
+requests/hour = 4.276 rps x 3600 = 15395.4
+cost per 1000 requests = 7.9000 / 15395.4 x 1000 = 0.5131 INR
+SLO 99.0% success over one run of 509 requests: error budget = 5.09 requests; used 5 (98.2% of budget)

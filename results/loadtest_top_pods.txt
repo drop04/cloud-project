@@ -1,3 +1,3 @@
-NAME                      CPU(cores)   MEMORY(bytes)   
-parser-78b786b767-64h64   997m         437Mi           
-parser-78b786b767-h2rrw   996m         411Mi           
+NAME                     CPU(cores)   MEMORY(bytes)   
+parser-cdcdcb959-4ntnh   996m         395Mi           
+parser-cdcdcb959-mmtng   997m         449Mi           

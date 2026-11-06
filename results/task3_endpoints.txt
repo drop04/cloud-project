@@ -1,0 +1,27 @@
+14:20:02 /readyz -> 000
+14:20:02 /readyz -> 000
+14:20:02 /readyz -> 000
+14:20:03 /readyz -> 503
+14:20:03 /readyz -> 503
+14:20:03 /readyz -> 503
+14:20:03 /readyz -> 503
+14:20:04 /readyz -> 503
+14:20:04 /readyz -> 503
+14:20:04 /readyz -> 503
+14:20:04 /readyz -> 503
+14:20:05 /readyz -> 503
+14:20:05 /readyz -> 503
+14:20:05 /readyz -> 503
+14:20:05 /readyz -> 503
+14:20:05 /readyz -> 503
+14:20:06 /readyz -> 503
+14:20:06 /readyz -> 503
+14:20:06 /readyz -> 503
+14:20:06 /readyz -> 200
+HTTP/1.1 200 OK
+date: Fri, 06 Nov 2026 08:50:06 GMT
+server: uvicorn
+content-length: 14
+content-type: application/json
+
+{"ready":true}

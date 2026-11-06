@@ -1,0 +1,3 @@
+teacher/shard-0.jsonl 1500
+teacher/shard-1.jsonl 1500
+pool 3000 seen 3000 gaps 0 repeats 0
