@@ -2,6 +2,8 @@
 
 Teacher `phi3.5` (Ollama, temp 0, seed 42) → sequence-level distillation → `pythia-70m` student → FastAPI service on k3d.
 
+Repository: https://github.com/drop04/cloud-project
+
 ## Prerequisites
 docker, k3d, kubectl, Python 3.11, [Ollama](https://ollama.com), `pip install locust ruff pytest`.
 
